@@ -3,9 +3,14 @@ import BookShelfChanger from './book-shelf-changer';
 
 import * as BooksAPI from '../utils/BooksAPI';
 
+// This component represents a book. It displays book information.
+// It receives the following props from the parent component
+// (a) book object
+// (b) on book shelf change callback function
 class Book extends Component {
   updateShelf(newShelf) {
     const { book, onBookShelfChange } = this.props;
+
     BooksAPI.update(book, newShelf)
       .then(data => {
         console.log(
@@ -27,6 +32,7 @@ class Book extends Component {
 
   render() {
     const { book } = this.props;
+
     return (
       <li>
         <div className="book">

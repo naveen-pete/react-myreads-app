@@ -1,3 +1,10 @@
+// ========================================================================
+// >>> IMPORTANT NOTE <<<
+// This is the original static component that is used as a reference for
+// creating various components for the app. It is not used anywhere within
+// the app. This was originally provided in Udacity's Github repository.
+// ========================================================================
+
 import React from 'react';
 // import * as BooksAPI from './BooksAPI'
 import './App.css';

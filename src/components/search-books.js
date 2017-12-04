@@ -5,6 +5,10 @@ import _ from 'lodash';
 import * as BookAPI from '../utils/BooksAPI';
 import Book from './book';
 
+// This component allows the user to search for the books.
+// It receives the following props from the parent component
+// (a) array of all books for the user
+// (b) on book shelf change callback function
 class SearchBooks extends Component {
   constructor(props) {
     super(props);
@@ -12,10 +16,14 @@ class SearchBooks extends Component {
     this.state = { searchResult: [] };
 
     this.searchBooks = this.searchBooks.bind(this);
+
+    // using lodash.debounce() method to reduce the number of requests
+    // to the server
     this.debouncedSearchBooks = _.debounce(this.searchBooks, 400);
   }
 
   searchBooks(query) {
+    // do not make a server call if the user query text is empty
     query = query.trim();
     if (query.length <= 0) return;
 
@@ -23,6 +31,7 @@ class SearchBooks extends Component {
     BookAPI.search(query)
       .then(searchResult => {
         console.log('SUCCESS: Book search successfully completed!');
+
         if (searchResult && searchResult.length > 0) {
           this.setState({ searchResult });
           console.log(`  Books found. (Count: ${searchResult.length})`);
@@ -59,8 +68,12 @@ class SearchBooks extends Component {
           <ol className="books-grid">
             {this.state.searchResult &&
               this.state.searchResult.map(book => {
+                // check if the search result book is already in available
+                // in one of the user's shelf. If so, assign the corresponding
+                // shelf so that it is selected by default in the drop down
                 let b = allBooks.find(bk => bk.id === book.id);
                 book['shelf'] = b ? b.shelf : 'none';
+
                 return (
                   <Book
                     key={book.id}

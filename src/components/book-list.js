@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 
 import BookShelf from './book-shelf';
 
+// This component shows the list of books for user in three shelves.
+// It receives the following props from the parent component
+// (a) categorized books object
+// (b) on book shelf change callback function
 const BookList = props => {
   const { categorizedBooks, onBookShelfChange } = props;
 
