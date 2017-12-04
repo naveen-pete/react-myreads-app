@@ -1,15 +1,22 @@
 import React from 'react';
 
-const BookShelfChanger = props => {
+import shelves from '../utils/shelves';
+
+const BookShelfChanger = ({ currentBookShelf, onBookShelfChange }) => {
   return (
     <div className="book-shelf-changer">
-      <select>
+      <select
+        defaultValue={currentBookShelf}
+        onChange={e => onBookShelfChange(e.target.value)}
+      >
         <option value="none" disabled>
           Move to...
         </option>
-        <option value="currentlyReading">Currently Reading</option>
-        <option value="wantToRead">Want to Read</option>
-        <option value="read">Read</option>
+        {shelves.map(shelf => (
+          <option key={shelf.code} value={shelf.code}>
+            {shelf.title}
+          </option>
+        ))}
         <option value="none">None</option>
       </select>
     </div>

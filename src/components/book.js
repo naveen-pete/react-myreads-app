@@ -1,26 +1,50 @@
-import React from 'react';
+import React, { Component } from 'react';
 import BookShelfChanger from './book-shelf-changer';
 
-const Book = ({ book }) => {
-  return (
-    <li>
-      <div className="book">
-        <div className="book-top">
-          <div
-            className="book-cover"
-            style={{
-              width: 128,
-              height: 192,
-              backgroundImage: `url("http://books.google.com/books/content?id=32haAAAAMAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE72yckZ5f5bDFVIf7BGPbjA0KYYtlQ__nWB-hI_YZmZ-fScYwFy4O_fWOcPwf-pgv3pPQNJP_sT5J_xOUciD8WaKmevh1rUR-1jk7g1aCD_KeJaOpjVu0cm_11BBIUXdxbFkVMdi&source=gbs_api")`
-            }}
-          />
-          <BookShelfChanger />
+import * as BooksAPI from '../utils/BooksAPI';
+
+class Book extends Component {
+  updateShelf(newShelf) {
+    const { book } = this.props;
+    BooksAPI.update(book, newShelf)
+      .then(data => {
+        this.props.onBookShelfChange();
+      })
+      .catch(error =>
+        console.log(
+          `ERROR: Unable to update shelf '${newShelf}' for the book '${
+            book.title
+          }'.`,
+          error
+        )
+      );
+  }
+
+  render() {
+    const { book } = this.props;
+    return (
+      <li>
+        <div className="book">
+          <div className="book-top">
+            <div
+              className="book-cover"
+              style={{
+                width: 128,
+                height: 192,
+                backgroundImage: `url("${book.imageLinks.thumbnail}")`
+              }}
+            />
+            <BookShelfChanger
+              currentBookShelf={book.shelf}
+              onBookShelfChange={newShelf => this.updateShelf(newShelf)}
+            />
+          </div>
+          <div className="book-title">{book.title}</div>
+          <div className="book-authors">{book.authors.join()}</div>
         </div>
-        <div className="book-title">{book.title}</div>
-        <div className="book-authors">{book.authors}</div>
-      </div>
-    </li>
-  );
-};
+      </li>
+    );
+  }
+}
 
 export default Book;
