@@ -5,10 +5,15 @@ import * as BooksAPI from '../utils/BooksAPI';
 
 class Book extends Component {
   updateShelf(newShelf) {
-    const { book } = this.props;
+    const { book, onBookShelfChange } = this.props;
     BooksAPI.update(book, newShelf)
       .then(data => {
-        this.props.onBookShelfChange();
+        console.log(
+          `SUCCESS: Bookshelf successfully updated! (Title: ${
+            book.title
+          }, New Shelf: ${newShelf})`
+        );
+        onBookShelfChange();
       })
       .catch(error =>
         console.log(
@@ -31,7 +36,9 @@ class Book extends Component {
               style={{
                 width: 128,
                 height: 192,
-                backgroundImage: `url("${book.imageLinks.thumbnail}")`
+                backgroundImage: `url("${
+                  book.imageLinks ? book.imageLinks.thumbnail : ''
+                }")`
               }}
             />
             <BookShelfChanger
@@ -40,7 +47,9 @@ class Book extends Component {
             />
           </div>
           <div className="book-title">{book.title}</div>
-          <div className="book-authors">{book.authors.join()}</div>
+          <div className="book-authors">
+            {book.authors ? book.authors.join() : ''}
+          </div>
         </div>
       </li>
     );
