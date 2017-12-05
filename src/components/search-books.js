@@ -28,16 +28,17 @@ class SearchBooks extends Component {
     if (query.length <= 0) return;
 
     console.log(`Book search initiated. (Search term: ${query})`);
+
     BookAPI.search(query)
       .then(searchResult => {
         console.log('SUCCESS: Book search successfully completed!');
 
         if (searchResult && searchResult.length > 0) {
-          this.setState({ searchResult });
           console.log(`  Books found. (Count: ${searchResult.length})`);
+          this.setState({ searchResult });
         } else {
-          this.setState({ searchResult: [] });
           console.log(`  No books matching the search term - '${query}')`);
+          this.setState({ searchResult: [] });
         }
       })
       .catch(error => {
@@ -48,8 +49,19 @@ class SearchBooks extends Component {
       });
   }
 
+  // check if the search result book is already available
+  // in one of the user's shelves. If so, merge the corresponding
+  // shelf field so that it gets selected by default in the drop down
+  // list of shelves for the book
+  findBookAndMergeShelf(allBooks, searchBook) {
+    const propShelf = 'shelf';
+    const userBook = allBooks.find(book => book.id === searchBook.id);
+    searchBook[propShelf] = userBook ? userBook[propShelf] : 'none';
+  }
+
   render() {
-    const { allBooks } = this.props;
+    const { allBooks, onBookShelfChange } = this.props;
+
     return (
       <div className="search-books">
         <div className="search-books-bar">
@@ -66,22 +78,16 @@ class SearchBooks extends Component {
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-            {this.state.searchResult &&
-              this.state.searchResult.map(book => {
-                // check if the search result book is already in available
-                // in one of the user's shelf. If so, assign the corresponding
-                // shelf so that it is selected by default in the drop down
-                let b = allBooks.find(bk => bk.id === book.id);
-                book['shelf'] = b ? b.shelf : 'none';
-
-                return (
-                  <Book
-                    key={book.id}
-                    book={book}
-                    onBookShelfChange={this.props.onBookShelfChange}
-                  />
-                );
-              })}
+            {this.state.searchResult.map(book => {
+              this.findBookAndMergeShelf(allBooks, book);
+              return (
+                <Book
+                  key={book.id}
+                  book={book}
+                  onBookShelfChange={onBookShelfChange}
+                />
+              );
+            })}
           </ol>
         </div>
       </div>

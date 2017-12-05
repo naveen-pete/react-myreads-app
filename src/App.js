@@ -4,7 +4,6 @@ import { Route } from 'react-router-dom';
 import './App.css';
 
 import * as BooksAPI from './utils/BooksAPI';
-import shelves from './utils/shelves';
 import BookList from './components/book-list';
 import SearchBooks from './components/search-books';
 
@@ -15,22 +14,8 @@ class BooksApp extends React.Component {
 
     this.state = {
       // array to hold all the books
-      allBooks: [],
-      // object to hold segregated books per shelf
-      categorizedBooks: this.initCategorizedBooks()
+      allBooks: []
     };
-  }
-
-  // This method is used to initialise 'categorizedBooks' object
-  // within component's state.
-  initCategorizedBooks() {
-    return shelves.reduce((prevObj, shelf) => {
-      prevObj[shelf.code] = {
-        shelf,
-        books: []
-      };
-      return prevObj;
-    }, {});
   }
 
   // Retrieves the list of books when the app starts
@@ -44,52 +29,70 @@ class BooksApp extends React.Component {
     BooksAPI.getAll()
       .then(allBooks => {
         console.log('SUCCESS: Book list retrieved successfully!');
-
-        const categorizedBooks = this.state.categorizedBooks;
-        for (let key in categorizedBooks) {
-          let category = categorizedBooks[key];
-          category.books = allBooks.filter(
-            book => book.shelf === category.shelf.code
-          );
-        }
-
-        this.setState({ allBooks, categorizedBooks });
+        this.setState({ allBooks });
       })
       .catch(error =>
         console.log('ERROR: Unable to retrieve books from the server.', error)
       );
   }
 
+  // Whenever user changes the shelf, update the book and get the updated
+  // book list
+  updateBookShelf(book, newShelf) {
+    BooksAPI.update(book, newShelf)
+      .then(data => {
+        console.log(
+          `SUCCESS: Bookshelf successfully updated! (Title: ${
+            book.title
+          }, New Shelf: ${newShelf})`
+        );
+
+        this.getBooks();
+      })
+      .catch(error =>
+        console.log(
+          `ERROR: Unable to update shelf '${newShelf}' for the book '${
+            book.title
+          }'.`,
+          error
+        )
+      );
+  }
+
   render() {
-    const { categorizedBooks, allBooks } = this.state;
+    const { allBooks } = this.state;
 
     return (
       <div className="app">
         {/* 
-          Categorized books object from state is passed to 
-          BookList component 
+          The array containing all books from component's state is 
+          passed to BookList component 
         */}
         <Route
           exact
           path="/"
           render={() => (
             <BookList
-              categorizedBooks={categorizedBooks}
-              onBookShelfChange={() => this.getBooks()}
+              allBooks={allBooks}
+              onBookShelfChange={(book, newShelf) =>
+                this.updateBookShelf(book, newShelf)
+              }
             />
           )}
         />
 
         {/* 
-          The array containing all books is passed to 
-          SearchBooks component 
+          The array containing all books from component's state is 
+          passed to SearchBooks component 
         */}
         <Route
           path="/search"
           render={() => (
             <SearchBooks
               allBooks={allBooks}
-              onBookShelfChange={() => this.getBooks()}
+              onBookShelfChange={(book, newShelf) =>
+                this.updateBookShelf(book, newShelf)
+              }
             />
           )}
         />

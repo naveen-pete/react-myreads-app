@@ -1,15 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import shelves from '../utils/shelves';
 import BookShelf from './book-shelf';
 
 // This component shows the list of books for user in three shelves.
 // It receives the following props from the parent component
 // (a) categorized books object
 // (b) on book shelf change callback function
-const BookList = props => {
-  const { categorizedBooks, onBookShelfChange } = props;
-
+const BookList = ({ allBooks, onBookShelfChange }) => {
   return (
     <div className="list-books">
       <div className="list-books-title">
@@ -17,13 +16,13 @@ const BookList = props => {
       </div>
       <div className="list-books-content">
         <div>
-          {Object.keys(categorizedBooks).map(key => {
-            let category = categorizedBooks[key];
+          {shelves.map(shelf => {
+            let shelfBooks = allBooks.filter(book => book.shelf === shelf.code);
             return (
               <BookShelf
-                key={category.shelf.code}
-                shelf={category.shelf}
-                books={category.books}
+                key={shelf.code}
+                shelf={shelf}
+                books={shelfBooks}
                 onBookShelfChange={onBookShelfChange}
               />
             );
